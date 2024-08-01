@@ -1,31 +1,27 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { API_URL } from '../../Config';
-
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { API_URL } from "../../Config";
 
 const RoleList = () => {
-  
   const [data, setData] = useState([]);
-  const token = useSelector((state)=>state.profile.token);
- 
+  const token = useSelector((state) => state.profile.token);
+
   axios.defaults.withCredentials = true;
-  axios.defaults.headers.common['Authorization'] = `token= ${token}`;
-  
+  axios.defaults.headers.common["Authorization"] = `token= ${token}`;
+
   //Get Role List
-  const getData = async ()=>{
-       try{
-        const response = await axios.get(`${API_URL}roles`,{});
-        console.log(response.data.data);
-        toast.success(response.data.message);
-        setData(response.data.data);
-       }
-       catch(error){
-        toast.error(error.message);
-       }
-  }
-  
+  const getData = async () => {
+    try {
+      const response = await axios.get(`${API_URL}roles`, {});
+      toast.success(response.data.message);
+      setData(response.data.data);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       document.cookie = `token= ${token}; path=/`;
@@ -41,12 +37,12 @@ const RoleList = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [newStatus, setNewStatus] = useState(1);
 
-  const [filterName, setFilterName] = useState('');
-  const [filterEmail, setFilterEmail] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [filterName, setFilterName] = useState("");
+  const [filterEmail, setFilterEmail] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
   const [sortField, setSortField] = useState(null);
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(5);
 
@@ -82,21 +78,21 @@ const RoleList = () => {
   };
 
   const handleDeleteUser = () => {
-    setData(data.filter(user => user.id !== currentUser.id));
+    setData(data.filter((user) => user.id !== currentUser.id));
     handleCloseDeleteConfirm();
   };
 
   const handleChangeStatus = () => {
-    setData(data.map(role =>{
-      console.log(role);
-      role._id === currentUser._id ? { ...role, status: newStatus } : role
-    }
-    ));
+    setData(
+      data.map((role) =>
+        role._id === currentUser._id ? { ...role, status: newStatus } : role
+      )
+    );
     handleCloseStatusConfirm();
   };
 
   const handleSort = (field) => {
-    const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+    const order = sortField === field && sortOrder === "asc" ? "desc" : "asc";
     setSortField(field);
     setSortOrder(order);
   };
@@ -104,26 +100,32 @@ const RoleList = () => {
   const getSortedData = (data) => {
     if (!sortField) return data;
     return [...data].sort((a, b) => {
-      if (a[sortField] < b[sortField]) return sortOrder === 'asc' ? -1 : 1;
-      if (a[sortField] > b[sortField]) return sortOrder === 'asc' ? 1 : -1;
+      if (a[sortField] < b[sortField]) return sortOrder === "asc" ? -1 : 1;
+      if (a[sortField] > b[sortField]) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
   };
 
-  const filteredData = data.filter(role =>
-    role.name.toLowerCase().includes(filterName.toLowerCase()) &&
-    (filterStatus === '' || role.status === Number(filterStatus))
+  const filteredData = data.filter(
+    (role) =>
+      role.name.toLowerCase().includes(filterName.toLowerCase()) &&
+      (filterStatus === "" || role.status === Number(filterStatus))
   );
-
   const sortedData = getSortedData(filteredData);
 
   const totalRecords = sortedData.length;
   const totalPages = Math.ceil(totalRecords / recordsPerPage);
-  const paginatedData = sortedData.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
+  const paginatedData = sortedData.slice(
+    (currentPage - 1) * recordsPerPage,
+    currentPage * recordsPerPage
+  );
 
-  const getStatusText = (status) => status === 1 ? 'Active' : 'Inactive';
+  const getStatusText = (status) => (status === true ? "Active" : "Inactive");
 
-  const getStatusButtonClass = (status) => status === 1 ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600';
+  const getStatusButtonClass = (status) =>
+    status === true
+      ? "bg-green-500 hover:bg-green-600"
+      : "bg-red-500 hover:bg-red-600";
 
   return (
     <div className="p-6">
@@ -168,21 +170,44 @@ const RoleList = () => {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('id')}>ID</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('name')}>Name</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('status')}>Status</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+              onClick={() => handleSort("id")}
+            >
+              ID
+            </th>
+            <th
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+              onClick={() => handleSort("name")}
+            >
+              Name
+            </th>
+            <th
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+              onClick={() => handleSort("status")}
+            >
+              Status
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {paginatedData.map((role, index) => (
             <tr key={role._id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{++index}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{role.name}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {++index}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {role.name}
+              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 <button
                   onClick={() => handleOpenStatusConfirm(role._id)}
-                  className={`ml-2 px-2 py-1 text-white rounded hover:bg-gray-600 ${getStatusButtonClass(role.status)}`}
+                  className={`ml-2 px-2 py-1 text-white rounded hover:bg-gray-600 ${getStatusButtonClass(
+                    role.status
+                  )}`}
                 >
                   {getStatusText(role.status)}
                 </button>
@@ -208,15 +233,19 @@ const RoleList = () => {
 
       <div className="mt-4 flex justify-between items-center">
         <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
           className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
         >
           Previous
         </button>
-        <span>Page {currentPage} of {totalPages}</span>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
         <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
           className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
         >
@@ -227,12 +256,20 @@ const RoleList = () => {
       {/* Create Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-gray-500 opacity-50" onClick={handleCloseCreateModal}></div>
+          <div
+            className="absolute inset-0 bg-gray-500 opacity-50"
+            onClick={handleCloseCreateModal}
+          ></div>
           <div className="bg-white p-6 rounded-lg shadow-lg z-10 w-full max-w-md mx-4">
             <h2 className="text-lg font-bold mb-4">Create User</h2>
             <form>
               <div className="mb-4">
-                <label htmlFor="create-name" className="block text-sm font-medium text-gray-700">Name</label>
+                <label
+                  htmlFor="create-name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Name
+                </label>
                 <input
                   type="text"
                   id="create-name"
@@ -240,7 +277,12 @@ const RoleList = () => {
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="create-email" className="block text-sm font-medium text-gray-700">Email</label>
+                <label
+                  htmlFor="create-email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Email
+                </label>
                 <input
                   type="email"
                   id="create-email"
@@ -248,8 +290,19 @@ const RoleList = () => {
                 />
               </div>
               <div className="flex gap-4">
-                <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">Save</button>
-                <button type="button" onClick={handleCloseCreateModal} className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">Cancel</button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCloseCreateModal}
+                  className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -259,12 +312,20 @@ const RoleList = () => {
       {/* Edit Modal */}
       {isEditModalOpen && currentUser && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-gray-500 opacity-50" onClick={handleCloseEditModal}></div>
+          <div
+            className="absolute inset-0 bg-gray-500 opacity-50"
+            onClick={handleCloseEditModal}
+          ></div>
           <div className="bg-white p-6 rounded-lg shadow-lg z-10 w-full max-w-md mx-4">
             <h2 className="text-lg font-bold mb-4">Edit User</h2>
             <form>
               <div className="mb-4">
-                <label htmlFor="edit-name" className="block text-sm font-medium text-gray-700">Name</label>
+                <label
+                  htmlFor="edit-name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Name
+                </label>
                 <input
                   type="text"
                   id="edit-name"
@@ -273,7 +334,12 @@ const RoleList = () => {
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="edit-email" className="block text-sm font-medium text-gray-700">Email</label>
+                <label
+                  htmlFor="edit-email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Email
+                </label>
                 <input
                   type="email"
                   id="edit-email"
@@ -282,8 +348,19 @@ const RoleList = () => {
                 />
               </div>
               <div className="flex gap-4">
-                <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">Save</button>
-                <button type="button" onClick={handleCloseEditModal} className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">Cancel</button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCloseEditModal}
+                  className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -293,7 +370,10 @@ const RoleList = () => {
       {/* Delete Confirmation Modal */}
       {isDeleteConfirmOpen && currentUser && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-gray-500 opacity-50" onClick={handleCloseDeleteConfirm}></div>
+          <div
+            className="absolute inset-0 bg-gray-500 opacity-50"
+            onClick={handleCloseDeleteConfirm}
+          ></div>
           <div className="bg-white p-6 rounded-lg shadow-lg z-10 w-full max-w-sm mx-4">
             <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
             <p>Are you sure you want to delete {currentUser.name}?</p>
@@ -318,10 +398,16 @@ const RoleList = () => {
       {/* Status Confirmation Modal */}
       {isStatusConfirmOpen && currentUser && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-gray-500 opacity-50" onClick={handleCloseStatusConfirm}></div>
+          <div
+            className="absolute inset-0 bg-gray-500 opacity-50"
+            onClick={handleCloseStatusConfirm}
+          ></div>
           <div className="bg-white p-6 rounded-lg shadow-lg z-10 w-full max-w-sm mx-4">
             <h2 className="text-lg font-bold mb-4">Confirm Status Change</h2>
-            <p>Are you sure you want to change the status to {newStatus === 1 ? 'Active' : 'Inactive'}?</p>
+            <p>
+              Are you sure you want to change the status to{" "}
+              {newStatus === true ? "Active" : "Inactive"}?
+            </p>
             <div className="flex gap-4 mt-4">
               <button
                 onClick={handleChangeStatus}
